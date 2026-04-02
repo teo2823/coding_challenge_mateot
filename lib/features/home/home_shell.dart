@@ -5,6 +5,8 @@ import '../portfolio/screens/portfolio_screen.dart';
 import '../transactions/screens/transactions_screen.dart';
 import '../../core/theme/app_theme.dart';
 
+const double kMaxContentWidth = 720;
+
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
@@ -28,53 +30,71 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final navBg = isDark ? AppColors.darkSurface : AppColors.white;
+
     return Scaffold(
       body: SafeArea(
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 250),
-          child: IndexedStack(
-            key: ValueKey(_currentIndex),
-            index: _currentIndex,
-            children: _screens,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: kMaxContentWidth),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: IndexedStack(
+                key: ValueKey(_currentIndex),
+                index: _currentIndex,
+                children: _screens,
+              ),
+            ),
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
+      bottomNavigationBar: Align(
+        alignment: Alignment.bottomCenter,
+        heightFactor: 1,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: kMaxContentWidth),
+          child: Container(
+            decoration: BoxDecoration(
+              color: navBg,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: _onTabSelected,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_balance_outlined),
-              activeIcon: Icon(Icons.account_balance),
-              label: 'Fondos',
+            child: BottomNavigationBar(
+              currentIndex: _currentIndex,
+              onTap: _onTabSelected,
+              backgroundColor: navBg,
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.account_balance_outlined),
+                  activeIcon: Icon(Icons.account_balance),
+                  label: 'Fondos',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.pie_chart_outline),
+                  activeIcon: Icon(Icons.pie_chart),
+                  label: 'Portafolio',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.receipt_long_outlined),
+                  activeIcon: Icon(Icons.receipt_long),
+                  label: 'Historial',
+                ),
+              ],
+              selectedItemColor: AppColors.blue,
+              unselectedItemColor: AppColors.lightTextSecondary,
+              showUnselectedLabels: true,
+              type: BottomNavigationBarType.fixed,
+              elevation: 0,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.pie_chart_outline),
-              activeIcon: Icon(Icons.pie_chart),
-              label: 'Portafolio',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long_outlined),
-              activeIcon: Icon(Icons.receipt_long),
-              label: 'Historial',
-            ),
-          ],
-          selectedItemColor: AppColors.blueAccent,
-          unselectedItemColor: AppColors.textSecondary,
-          showUnselectedLabels: true,
-          type: BottomNavigationBarType.fixed,
-          elevation: 0, // ya usamos shadow en container
+          ),
         ),
       ),
     );
