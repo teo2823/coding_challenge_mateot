@@ -1,35 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../funds/screens/funds_screen.dart';
 import '../portfolio/screens/portfolio_screen.dart';
 import '../transactions/screens/transactions_screen.dart';
 import '../../core/theme/app_theme.dart';
+import '../../providers/tab_provider.dart';
 
 const double kMaxContentWidth = 720;
 
-class HomeShell extends StatefulWidget {
+class HomeShell extends ConsumerWidget {
   const HomeShell({super.key});
 
-  @override
-  State<HomeShell> createState() => _HomeShellState();
-}
-
-class _HomeShellState extends State<HomeShell> {
-  int _currentIndex = 0;
-
-  final List<Widget> _screens = const [
+  static const _screens = [
     FundsScreen(),
     PortfolioScreen(),
     TransactionsScreen(),
   ];
 
-  void _onTabSelected(int index) {
-    if (_currentIndex == index) return;
-    setState(() => _currentIndex = index);
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentIndex = ref.watch(selectedTabProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final navBg = isDark ? AppColors.darkSurface : AppColors.white;
@@ -43,8 +34,8 @@ class _HomeShellState extends State<HomeShell> {
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
               child: IndexedStack(
-                key: ValueKey(_currentIndex),
-                index: _currentIndex,
+                key: ValueKey(currentIndex),
+                index: currentIndex,
                 children: _screens,
               ),
             ),
@@ -68,8 +59,8 @@ class _HomeShellState extends State<HomeShell> {
               ],
             ),
             child: BottomNavigationBar(
-              currentIndex: _currentIndex,
-              onTap: _onTabSelected,
+              currentIndex: currentIndex,
+              onTap: (i) => ref.read(selectedTabProvider.notifier).select(i),
               backgroundColor: navBg,
               items: const [
                 BottomNavigationBarItem(
