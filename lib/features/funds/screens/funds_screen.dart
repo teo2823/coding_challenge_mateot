@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../../core/utils/currency_formatter.dart';
 import '../../../data/models/fund.dart';
 import '../../../providers/portfolio_provider.dart';
-import '../../../providers/theme_provider.dart';
+import '../../../shared/widgets/custom_app_bar.dart';
 import '../../../shared/widgets/shimmer_box.dart';
 import '../../../shared/widgets/staggered_item.dart';
 import '../widgets/fund_card.dart';
@@ -24,54 +23,13 @@ class _FundsScreenState extends ConsumerState<FundsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final balance = ref.watch(portfolioProvider.select((s) => s.balance));
-    final isDark = theme.brightness == Brightness.dark;
     final fundsAsync = ref.watch(fundsProvider);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            pinned: true,
-            backgroundColor: theme.scaffoldBackgroundColor,
-            scrolledUnderElevation: 0,
-            title: Text('Invex Up', style: theme.textTheme.headlineMedium),
-            actions: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.teal.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.account_balance_wallet_outlined,
-                        size: 14, color: AppColors.teal),
-                    const SizedBox(width: 6),
-                    Text(
-                      CurrencyFormatter.format(balance),
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.teal,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                onPressed: () => ref.read(themeProvider.notifier).toggle(),
-                icon: Icon(
-                  isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 4),
-            ],
-          ),
+          const CustomAppBar(),
 
           // Header + filtros
           SliverToBoxAdapter(

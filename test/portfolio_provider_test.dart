@@ -13,6 +13,13 @@ void main() {
     category: FundCategory.fpv,
   );
 
+  const ficFund = Fund(
+    id: '2',
+    name: 'FIC_ACCIONES',
+    minimumAmount: 100000,
+    category: FundCategory.fic,
+  );
+
   ProviderContainer makeContainer() => ProviderContainer();
 
   group('PortfolioProvider — estado inicial', () {
@@ -117,6 +124,66 @@ void main() {
     });
   });
 
+  group('PortfolioProvider — subscribe (datos de transacción)', () {
+    test('la transacción tiene el fundId y fundName correctos', () async {
+      final container = makeContainer();
+      await container.read(portfolioProvider.notifier).subscribe(
+            fund: fpvFund,
+            amount: 100000,
+            notificationMethod: NotificationMethod.email,
+          );
+      final tx = container.read(portfolioProvider).transactions.first;
+      expect(tx.fundId, fpvFund.id);
+      expect(tx.fundName, fpvFund.name);
+    });
+
+    test('la transacción guarda el método de notificación', () async {
+      final container = makeContainer();
+      await container.read(portfolioProvider.notifier).subscribe(
+            fund: fpvFund,
+            amount: 100000,
+            notificationMethod: NotificationMethod.sms,
+          );
+      final tx = container.read(portfolioProvider).transactions.first;
+      expect(tx.notificationMethod, NotificationMethod.sms);
+    });
+
+    test('las transacciones se ordenan de más reciente a más antigua', () async {
+      final container = makeContainer();
+      await container.read(portfolioProvider.notifier).subscribe(
+            fund: fpvFund,
+            amount: 100000,
+            notificationMethod: NotificationMethod.email,
+          );
+      await container.read(portfolioProvider.notifier).subscribe(
+            fund: ficFund,
+            amount: 100000,
+            notificationMethod: NotificationMethod.email,
+          );
+      final txs = container.read(portfolioProvider).transactions;
+      expect(txs.first.fundId, ficFund.id);
+      expect(txs.last.fundId, fpvFund.id);
+    });
+
+    test('puede suscribirse a múltiples fondos distintos', () async {
+      final container = makeContainer();
+      await container.read(portfolioProvider.notifier).subscribe(
+            fund: fpvFund,
+            amount: 100000,
+            notificationMethod: NotificationMethod.email,
+          );
+      await container.read(portfolioProvider.notifier).subscribe(
+            fund: ficFund,
+            amount: 100000,
+            notificationMethod: NotificationMethod.email,
+          );
+      final state = container.read(portfolioProvider);
+      expect(state.isSubscribed(fpvFund.id), isTrue);
+      expect(state.isSubscribed(ficFund.id), isTrue);
+      expect(state.balance, AppConstants.initialBalance - 200000);
+    });
+  });
+
   group('PortfolioProvider — cancel', () {
     test('reintegra el monto al saldo al cancelar', () async {
       final container = makeContainer();
@@ -161,6 +228,53 @@ void main() {
           );
       await container.read(portfolioProvider.notifier).cancel(fund: fpvFund);
       expect(container.read(portfolioProvider).transactions.length, 2);
+    });
+
+    test('cancelar un fondo no suscrito no hace nada', () async {
+      final container = makeContainer();
+      final balanceBefore = container.read(portfolioProvider).balance;
+      await container.read(portfolioProvider.notifier).cancel(fund: fpvFund);
+      final state = container.read(portfolioProvider);
+      expect(state.balance, balanceBefore);
+      expect(state.transactions, isEmpty);
+    });
+  });
+
+  group('PortfolioState — getters', () {
+    test('investedAmount retorna 0 para fondo no suscrito', () {
+      final state = const PortfolioState(
+        balance: 500000,
+        subscribedFunds: {},
+        transactions: [],
+      );
+      expect(state.investedAmount('fondo-inexistente'), 0);
+    });
+
+    test('isSubscribed retorna false para fondo no suscrito', () {
+      final state = const PortfolioState(
+        balance: 500000,
+        subscribedFunds: {},
+        transactions: [],
+      );
+      expect(state.isSubscribed('fondo-inexistente'), isFalse);
+    });
+
+    test('isSubscribed retorna true para fondo suscrito', () {
+      final state = const PortfolioState(
+        balance: 400000,
+        subscribedFunds: {'1': 100000},
+        transactions: [],
+      );
+      expect(state.isSubscribed('1'), isTrue);
+    });
+
+    test('investedAmount retorna el monto correcto', () {
+      final state = const PortfolioState(
+        balance: 400000,
+        subscribedFunds: {'1': 150000},
+        transactions: [],
+      );
+      expect(state.investedAmount('1'), 150000);
     });
   });
 }

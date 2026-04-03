@@ -15,7 +15,7 @@ class AppColors {
   static const Color lightSurfaceVariant = Color(0xFFE8EEF9);
   static const Color lightTextPrimary = Color(0xFF0F1B35);
   static const Color lightTextSecondary = Color(0xFF5A6A8A);
-  static const Color lightDivider = Color(0xFFDDE3F0);
+  static const Color lightDivider = Color.fromARGB(255, 129, 133, 141);
 
   // Dark mode
   static const Color darkBackground = Color(0xFF0A0F1E);
@@ -23,7 +23,7 @@ class AppColors {
   static const Color darkSurfaceVariant = Color(0xFF1C2741);
   static const Color darkTextPrimary = Color(0xFFF0F4FF);
   static const Color darkTextSecondary = Color(0xFF8A9BBC);
-  static const Color darkDivider = Color(0xFF1E2D4A);
+  static const Color darkDivider = Color.fromARGB(255, 55, 63, 79);
 
   // Semantic
   static const Color error = Color(0xFFE03E3E);
