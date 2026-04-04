@@ -45,12 +45,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
             constraints: const BoxConstraints(maxWidth: kMaxContentWidth),
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
-              child: IndexedStack(
-                key: ValueKey(currentIndex),
-                index: currentIndex,
-                children: _screens,
-              ),
-            ),
+              child: _screens[currentIndex],
+            )
           ),
         ),
       ),
@@ -70,7 +66,12 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                 ),
               ],
             ),
-            child: BottomNavigationBar(
+            child: Theme(
+              data: Theme.of(context).copyWith(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+              ),
+              child: BottomNavigationBar(
               currentIndex: currentIndex,
               onTap: (i) => ref.read(selectedTabProvider.notifier).select(i),
               backgroundColor: navBg,
@@ -96,6 +97,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               showUnselectedLabels: true,
               type: BottomNavigationBarType.fixed,
               elevation: 0,
+            ),
             ),
           ),
         ),
