@@ -7,6 +7,8 @@ import '../funds/screens/funds_screen.dart';
 import '../portfolio/screens/portfolio_screen.dart';
 import '../transactions/screens/transactions_screen.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/currency_formatter.dart';
+import '../../providers/portfolio_provider.dart';
 import '../../providers/tab_provider.dart';
 import '../../providers/theme_provider.dart';
 
@@ -133,6 +135,7 @@ class _WebLayout extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final sidebarBg = isDark ? AppColors.darkSurface : AppColors.white;
+    final balance = ref.watch(portfolioProvider.select((s) => s.balance));
 
     const navItems = [
       (Icons.account_balance_outlined, Icons.account_balance, 'Fondos'),
@@ -153,7 +156,7 @@ class _WebLayout extends ConsumerWidget {
                 children: [
                   // Logo
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -166,6 +169,35 @@ class _WebLayout extends ConsumerWidget {
                             fontWeight: FontWeight.w700,
                             color: AppColors.teal,
                             height: 1.1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Balance
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Saldo disponible',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: (isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.lightTextSecondary)
+                                .withValues(alpha: 0.7),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          CurrencyFormatter.format(balance),
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.teal,
                           ),
                         ),
                       ],
@@ -200,11 +232,10 @@ class _WebLayout extends ConsumerWidget {
               ),
             ),
           ),
-          // Divider
           VerticalDivider(
             width: 1,
             thickness: 1,
-            color: theme.dividerColor,
+            color: Colors.white.withValues(alpha: 0.06),
           ),
           // Content
           Expanded(
