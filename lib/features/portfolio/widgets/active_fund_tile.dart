@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/adaptive_sheet.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../data/models/fund.dart';
 import '../../../providers/portfolio_provider.dart';
@@ -29,11 +30,9 @@ class ActiveFundTile extends ConsumerWidget {
       shadowColor: const Color(0xFF0F1B35).withValues(alpha: 0.06),
       elevation: isDark ? 0 : 4,
       child: ListTile(
-        onTap: () => showModalBottomSheet(
+        onTap: () => showAdaptiveSheet(
           context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (_) => FundDetailSheet(fund: fund),
+          child: FundDetailSheet(fund: fund),
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         contentPadding: const EdgeInsets.fromLTRB(16, 6, 12, 6),
