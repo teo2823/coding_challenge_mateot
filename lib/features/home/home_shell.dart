@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../funds/screens/funds_screen.dart';
@@ -9,9 +10,14 @@ import '../../providers/tab_provider.dart';
 
 const double kMaxContentWidth = 720;
 
-class HomeShell extends ConsumerWidget {
+class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
 
+  @override
+  ConsumerState<HomeShell> createState() => _HomeShellState();
+}
+
+class _HomeShellState extends ConsumerState<HomeShell> {
   static const _screens = [
     FundsScreen(),
     PortfolioScreen(),
@@ -19,7 +25,13 @@ class HomeShell extends ConsumerWidget {
   ];
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    super.initState();
+    FlutterNativeSplash.remove();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final currentIndex = ref.watch(selectedTabProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
