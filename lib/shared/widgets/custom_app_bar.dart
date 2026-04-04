@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,6 +14,9 @@ class CustomAppBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isWideScreen = kIsWeb && MediaQuery.sizeOf(context).width >= 600;
+    if (isWideScreen) return const SliverToBoxAdapter(child: SizedBox.shrink());
+
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final balance = showBalance
@@ -23,7 +27,22 @@ class CustomAppBar extends ConsumerWidget {
       pinned: true,
       backgroundColor: theme.scaffoldBackgroundColor,
       scrolledUnderElevation: 0,
-      title: Text('Invex Up', style: theme.textTheme.headlineMedium),
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Invex Up', style: theme.textTheme.headlineMedium),
+          const SizedBox(width: 3),
+          const Text(
+            '^',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: AppColors.teal,
+              height: 1.1,
+            ),
+          ),
+        ],
+      ),
       actions: [
         if (showBalance) ...[
           Container(

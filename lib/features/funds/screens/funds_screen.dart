@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -5,6 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../data/models/fund.dart';
 import '../../../providers/portfolio_provider.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
+import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/shimmer_box.dart';
 import '../../../shared/widgets/staggered_item.dart';
 import '../widgets/fund_card.dart';
@@ -24,6 +26,7 @@ class _FundsScreenState extends ConsumerState<FundsScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final fundsAsync = ref.watch(fundsProvider);
+    final isWideScreen = kIsWeb && MediaQuery.sizeOf(context).width >= 600;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -38,7 +41,8 @@ class _FundsScreenState extends ConsumerState<FundsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Fondos disponibles', style: theme.textTheme.displayMedium),
+                  Text('Fondos disponibles',
+                      style: theme.textTheme.displayMedium),
                   const SizedBox(height: 4),
                   fundsAsync.when(
                     loading: () => const ShimmerBox(width: 140, height: 14),
@@ -60,16 +64,18 @@ class _FundsScreenState extends ConsumerState<FundsScreen> {
                         _FilterChip(
                           label: 'Todos',
                           selected: _selectedCategory == null,
-                          onTap: () => setState(() => _selectedCategory = null),
+                          onTap: () =>
+                              setState(() => _selectedCategory = null),
                         ),
                         const SizedBox(width: 8),
                         _FilterChip(
                           label: 'FPV',
                           selected: _selectedCategory == FundCategory.fpv,
                           onTap: () => setState(
-                            () => _selectedCategory = _selectedCategory == FundCategory.fpv
-                                ? null
-                                : FundCategory.fpv,
+                            () => _selectedCategory =
+                                _selectedCategory == FundCategory.fpv
+                                    ? null
+                                    : FundCategory.fpv,
                           ),
                           color: AppColors.blue,
                         ),
@@ -78,9 +84,10 @@ class _FundsScreenState extends ConsumerState<FundsScreen> {
                           label: 'FIC',
                           selected: _selectedCategory == FundCategory.fic,
                           onTap: () => setState(
-                            () => _selectedCategory = _selectedCategory == FundCategory.fic
-                                ? null
-                                : FundCategory.fic,
+                            () => _selectedCategory =
+                                _selectedCategory == FundCategory.fic
+                                    ? null
+                                    : FundCategory.fic,
                           ),
                           color: AppColors.teal,
                         ),
@@ -92,22 +99,66 @@ class _FundsScreenState extends ConsumerState<FundsScreen> {
             ),
           ),
 
-          // Lista
+          // Lista / Grid
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
             sliver: fundsAsync.when(
-              loading: () => SliverList.separated(
-                itemCount: 5,
-                separatorBuilder: (_, _) => const SizedBox(height: 12),
-                itemBuilder: (_, _) => const FundCardShimmer(),
-              ),
-              error: (_, _) => SliverToBoxAdapter(
-                child: _ErrorState(onRetry: () => ref.invalidate(fundsProvider)),
+              loading: () => isWideScreen
+                  ? SliverGrid.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 380,
+                        mainAxisExtent: 152,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                      ),
+                      itemCount: 6,
+                      itemBuilder: (_, _) => const FundCardShimmer(),
+                    )
+                  : SliverList.separated(
+                      itemCount: 5,
+                      separatorBuilder: (_, _) => const SizedBox(height: 12),
+                      itemBuilder: (_, _) => const FundCardShimmer(),
+                    ),
+              error: (_, _) => SliverFillRemaining(
+                hasScrollBody: false,
+                child: EmptyState(
+                  icon: Icons.wifi_off_rounded,
+                  title: 'No pudimos cargar los fondos',
+                  description:
+                      'Revisa tu conexión e intenta de nuevo.',
+                  actionLabel: 'Reintentar',
+                  onAction: () => ref.invalidate(fundsProvider),
+                ),
               ),
               data: (funds) {
                 final filtered = _filterFunds(funds);
                 if (filtered.isEmpty) {
-                  return SliverToBoxAdapter(child: _EmptyFilter());
+                  return SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: EmptyState(
+                      icon: Icons.search_off_rounded,
+                      title: 'Sin resultados',
+                      description:
+                          'No hay fondos disponibles en esta categoría.',
+                    ),
+                  );
+                }
+                if (isWideScreen) {
+                  return SliverGrid.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 380,
+                      mainAxisExtent: 152,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                    ),
+                    itemCount: filtered.length,
+                    itemBuilder: (_, index) => StaggeredItem(
+                      index: index,
+                      child: FundCard(fund: filtered[index]),
+                    ),
+                  );
                 }
                 return SliverList.separated(
                   itemCount: filtered.length,
@@ -126,10 +177,12 @@ class _FundsScreenState extends ConsumerState<FundsScreen> {
   }
 
   List<Fund> _filterFunds(List<Fund> funds) {
-    final subscribed = ref.read(portfolioProvider).subscribedFunds;
+    final subscribed = ref.watch(portfolioProvider).subscribedFunds;
     return funds.where((f) {
       if (subscribed.containsKey(f.id)) return false;
-      if (_selectedCategory != null && f.category != _selectedCategory) return false;
+      if (_selectedCategory != null && f.category != _selectedCategory) {
+        return false;
+      }
       return true;
     }).toList();
   }
@@ -153,12 +206,12 @@ class _FilterChip extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    // En dark mode "Todos" usa blue en vez de navy (navy se pierde en dark)
     final chipColor = color ?? (isDark ? AppColors.blue : AppColors.navy);
-
-    final inactiveBg = isDark ? AppColors.darkSurfaceVariant : Colors.transparent;
+    final inactiveBg =
+        isDark ? AppColors.darkSurfaceVariant : Colors.transparent;
     final inactiveBorder = isDark ? Colors.transparent : theme.dividerColor;
-    final inactiveText = isDark ? AppColors.darkTextSecondary : theme.textTheme.bodySmall?.color;
+    final inactiveText =
+        isDark ? AppColors.darkTextSecondary : theme.textTheme.bodySmall?.color;
 
     return GestureDetector(
       onTap: onTap,
@@ -180,49 +233,6 @@ class _FilterChip extends StatelessWidget {
             fontWeight: FontWeight.w600,
             color: selected ? Colors.white : inactiveText,
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _EmptyFilter extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 48),
-      child: Center(
-        child: Text(
-          'No hay fondos en esta categoría.',
-          style: theme.textTheme.bodyMedium,
-        ),
-      ),
-    );
-  }
-}
-
-class _ErrorState extends StatelessWidget {
-  final VoidCallback onRetry;
-
-  const _ErrorState({required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 48),
-        child: Column(
-          children: [
-            Icon(Icons.wifi_off_rounded,
-                size: 40,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.3)),
-            const SizedBox(height: 16),
-            Text('No pudimos cargar los fondos', style: theme.textTheme.bodyMedium),
-            const SizedBox(height: 12),
-            TextButton(onPressed: onRetry, child: const Text('Reintentar')),
-          ],
         ),
       ),
     );

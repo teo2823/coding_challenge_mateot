@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/adaptive_sheet.dart';
 import '../../../core/utils/app_toast.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/currency_input_formatter.dart';
@@ -11,6 +13,7 @@ import '../../../core/utils/validators.dart';
 import '../../../data/models/fund.dart';
 import '../../../data/models/transaction.dart';
 import '../../../providers/portfolio_provider.dart';
+import 'subscription_success_sheet.dart';
 
 class SubscribeBottomSheet extends ConsumerStatefulWidget {
   final Fund fund;
@@ -45,10 +48,14 @@ class _SubscribeBottomSheetState extends ConsumerState<SubscribeBottomSheet> {
         ? balance - _enteredAmount!
         : null;
 
+    final isWideScreen = kIsWeb && MediaQuery.sizeOf(context).width >= 600;
+
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: isWideScreen
+            ? BorderRadius.circular(24)
+            : const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.fromLTRB(
         24,
@@ -64,16 +71,17 @@ class _SubscribeBottomSheetState extends ConsumerState<SubscribeBottomSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Handle
-            Center(
-              child: Container(
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: theme.dividerColor,
-                  borderRadius: BorderRadius.circular(2),
+            if (!isWideScreen)
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: theme.dividerColor,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-            ),
             const SizedBox(height: 24),
 
             Text('Suscribirse al fondo', style: theme.textTheme.headlineMedium),
@@ -151,7 +159,7 @@ class _SubscribeBottomSheetState extends ConsumerState<SubscribeBottomSheet> {
             ),
 
             const SizedBox(height: 24),
-            Divider(color: theme.dividerColor),
+            Divider(color: theme.dividerColor.withValues(alpha: 0.3)),
             const SizedBox(height: 20),
 
             // Método de notificación
@@ -247,11 +255,12 @@ class _SubscribeBottomSheetState extends ConsumerState<SubscribeBottomSheet> {
           );
       if (mounted) {
         Navigator.pop(context);
-        AppToast.show(
-          context,
-          type: ToastificationType.success,
-          title: 'Suscripción exitosa',
-          description: 'Invertiste ${CurrencyFormatter.format(_enteredAmount!)} en ${widget.fund.name}.',
+        showAdaptiveSheet(
+          context: context,
+          child: SubscriptionSuccessSheet(
+            fund: widget.fund,
+            amount: _enteredAmount!,
+          ),
         );
       }
     } catch (e) {

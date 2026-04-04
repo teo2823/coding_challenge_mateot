@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../providers/portfolio_provider.dart';
-import '../../../providers/tab_provider.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../widgets/transaction_tile.dart';
@@ -38,9 +37,6 @@ class TransactionsScreen extends ConsumerWidget {
                 title: 'Sin movimientos aún',
                 description:
                     'Tus suscripciones y cancelaciones aparecerán aquí.',
-                actionLabel: 'Explorar fondos',
-                onAction: () =>
-                    ref.read(selectedTabProvider.notifier).select(0),
               ),
             )
           else
