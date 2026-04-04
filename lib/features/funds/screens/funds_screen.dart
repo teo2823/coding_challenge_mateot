@@ -177,7 +177,7 @@ class _FundsScreenState extends ConsumerState<FundsScreen> {
   }
 
   List<Fund> _filterFunds(List<Fund> funds) {
-    final subscribed = ref.read(portfolioProvider).subscribedFunds;
+    final subscribed = ref.watch(portfolioProvider).subscribedFunds;
     return funds.where((f) {
       if (subscribed.containsKey(f.id)) return false;
       if (_selectedCategory != null && f.category != _selectedCategory) {

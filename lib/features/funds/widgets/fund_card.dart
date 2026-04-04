@@ -84,66 +84,51 @@ class FundCard extends StatelessWidget {
       );
     }
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeOutQuart,
-      padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurfaceVariant : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: const Color(0xFF0F1B35).withValues(alpha: 0.06),
-                  blurRadius: 16,
-                  spreadRadius: -2,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _CategoryBadge(category: fund.category),
-                const SizedBox(height: 10),
-                Text(
-                  fund.name,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontSize: 15,
-                    letterSpacing: -0.1,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  'Mín. ${CurrencyFormatter.format(fund.minimumAmount)}',
-                  style: theme.textTheme.bodySmall,
-                ),
-              ],
+    return Material(
+      color: isDark ? AppColors.darkSurfaceVariant : Colors.white,
+      borderRadius: BorderRadius.circular(20),
+      shadowColor: const Color(0xFF0F1B35).withValues(alpha: 0.06),
+      elevation: isDark ? 0 : 4,
+      child: ListTile(
+        onTap: handleSubscribe,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        contentPadding: const EdgeInsets.fromLTRB(16, 6, 12, 6),
+        leading: Icon(
+          fund.category == FundCategory.fpv
+              ? Icons.account_balance_rounded
+              : Icons.bar_chart_rounded,
+          size: 24,
+          color: fund.category == FundCategory.fpv
+              ? AppColors.blue
+              : AppColors.teal,
+        ),
+        title: Row(
+          children: [
+            _CategoryBadge(category: fund.category),
+          ],
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 3),
+            Text(
+              fund.name,
+              style: theme.textTheme.headlineSmall?.copyWith(fontSize: 14),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          const SizedBox(width: 12),
-          FilledButton(
-            onPressed: handleSubscribe,
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.blue,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              shape:
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              textStyle:
-                  const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+            const SizedBox(height: 2),
+            Text(
+              'Mín. ${CurrencyFormatter.format(fund.minimumAmount)}',
+              style: theme.textTheme.bodySmall,
             ),
-            child: const Text('Suscribirse'),
-          ),
-        ],
+          ],
+        ),
+        trailing: Icon(
+          Icons.chevron_right_rounded,
+          size: 28,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+        ),
       ),
     );
   }
