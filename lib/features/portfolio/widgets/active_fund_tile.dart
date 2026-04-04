@@ -82,7 +82,7 @@ class ActiveFundTile extends ConsumerWidget {
         ),
         trailing: Icon(
           Icons.chevron_right_rounded,
-          size: 20,
+          size: 28,
           color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
         ),
       ),

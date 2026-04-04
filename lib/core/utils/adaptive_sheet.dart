@@ -6,7 +6,9 @@ Future<T?> showAdaptiveSheet<T>({
   required Widget child,
   double maxWidth = 560,
 }) {
-  if (kIsWeb) {
+  final isWideScreen = kIsWeb && MediaQuery.sizeOf(context).width >= 600;
+
+  if (isWideScreen) {
     return showDialog<T>(
       context: context,
       builder: (_) => Dialog(

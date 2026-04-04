@@ -20,11 +20,12 @@ class SubscriptionSuccessSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final isWideScreen = kIsWeb && MediaQuery.sizeOf(context).width >= 600;
 
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: kIsWeb
+        borderRadius: isWideScreen
             ? BorderRadius.circular(24)
             : const BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -38,7 +39,7 @@ class SubscriptionSuccessSheet extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Handle
-          if (!kIsWeb)
+          if (!isWideScreen)
             Container(
               width: 36,
               height: 4,

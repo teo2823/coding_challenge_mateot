@@ -32,10 +32,12 @@ class FundDetailSheet extends ConsumerWidget {
     final isFpv = fund.category == FundCategory.fpv;
     final categoryColor = isFpv ? AppColors.blue : AppColors.teal;
 
+    final isWideScreen = kIsWeb && MediaQuery.sizeOf(context).width >= 600;
+
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: kIsWeb
+        borderRadius: isWideScreen
             ? BorderRadius.circular(24)
             : const BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -50,13 +52,13 @@ class FundDetailSheet extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Handle
-          if (!kIsWeb)
+          if (!isWideScreen)
             Center(
               child: Container(
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: theme.dividerColor,
+                  color: theme.dividerColor.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),

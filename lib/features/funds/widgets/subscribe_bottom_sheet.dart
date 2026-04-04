@@ -48,10 +48,12 @@ class _SubscribeBottomSheetState extends ConsumerState<SubscribeBottomSheet> {
         ? balance - _enteredAmount!
         : null;
 
+    final isWideScreen = kIsWeb && MediaQuery.sizeOf(context).width >= 600;
+
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: kIsWeb
+        borderRadius: isWideScreen
             ? BorderRadius.circular(24)
             : const BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -69,7 +71,7 @@ class _SubscribeBottomSheetState extends ConsumerState<SubscribeBottomSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Handle
-            if (!kIsWeb)
+            if (!isWideScreen)
               Center(
                 child: Container(
                   width: 36,
@@ -157,7 +159,7 @@ class _SubscribeBottomSheetState extends ConsumerState<SubscribeBottomSheet> {
             ),
 
             const SizedBox(height: 24),
-            Divider(color: theme.dividerColor),
+            Divider(color: theme.dividerColor.withValues(alpha: 0.3)),
             const SizedBox(height: 20),
 
             // Método de notificación
