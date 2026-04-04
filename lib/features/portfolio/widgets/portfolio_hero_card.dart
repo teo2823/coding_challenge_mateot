@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
@@ -19,6 +20,7 @@ class PortfolioHeroCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isWideScreen = kIsWeb && MediaQuery.sizeOf(context).width >= 600;
 
     final gradientColors = isDark
         ? [const Color(0xFF0D4F45), const Color(0xFF0A3D6B)]
@@ -80,18 +82,37 @@ class PortfolioHeroCard extends StatelessWidget {
             ),
             const SizedBox(height: 28),
             Row(
+              mainAxisSize: isWideScreen ? MainAxisSize.min : MainAxisSize.max,
               children: [
-                StatChip(
-                  label: 'Total invertido',
-                  value: CurrencyFormatter.format(totalInvested),
-                  icon: Icons.trending_up_rounded,
-                ),
-                const SizedBox(width: 12),
-                StatChip(
-                  label: 'Fondos activos',
-                  value: '$activeFundsCount',
-                  icon: Icons.account_balance_outlined,
-                ),
+                if (isWideScreen) ...[
+                  StatChip(
+                    label: 'Total invertido',
+                    value: CurrencyFormatter.format(totalInvested),
+                    icon: Icons.trending_up_rounded,
+                  ),
+                  const SizedBox(width: 12),
+                  StatChip(
+                    label: 'Fondos activos',
+                    value: '$activeFundsCount',
+                    icon: Icons.account_balance_outlined,
+                  ),
+                ] else ...[
+                  Expanded(
+                    child: StatChip(
+                      label: 'Total invertido',
+                      value: CurrencyFormatter.format(totalInvested),
+                      icon: Icons.trending_up_rounded,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: StatChip(
+                      label: 'Fondos activos',
+                      value: '$activeFundsCount',
+                      icon: Icons.account_balance_outlined,
+                    ),
+                  ),
+                ],
               ],
             ),
           ],
