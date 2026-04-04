@@ -8,19 +8,19 @@ class AppConstants {
   static const List<Fund> availableFunds = [
     Fund(
       id: '1',
-      name: 'FPV_RECAUDADORA',
+      name: 'FPV_BTG_PACTUAL_RECAUDADORA',
       minimumAmount: 75000,
       category: FundCategory.fpv,
     ),
     Fund(
       id: '2',
-      name: 'FPV_ECOPETROL',
+      name: 'FPV_BTG_PACTUAL_ECOPETROL',
       minimumAmount: 125000,
       category: FundCategory.fpv,
     ),
     Fund(
       id: '5',
-      name: 'FPV_DINAMICA',
+      name: 'FPV_BTG_PACTUAL_DINAMICA',
       minimumAmount: 100000,
       category: FundCategory.fpv,
     ),
