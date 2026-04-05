@@ -15,6 +15,7 @@ dependencies:
   shimmer: ^3.0.0
   toastification: ^3.0.3
   flutter_native_splash: ^2.4.3
+  fl_chart: ^1.2.0
 
 dev_dependencies:
   flutter_test:
