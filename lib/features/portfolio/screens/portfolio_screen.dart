@@ -10,6 +10,7 @@ import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/staggered_item.dart';
 import '../widgets/active_fund_tile.dart';
 import '../widgets/active_fund_tile_shimmer.dart';
+import '../widgets/portfolio_chart.dart';
 import '../widgets/portfolio_hero_card.dart';
 
 class PortfolioScreen extends ConsumerWidget {
@@ -49,8 +50,20 @@ class PortfolioScreen extends ConsumerWidget {
               ),
             ),
 
+            if (activeFunds.isNotEmpty)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 28),
+                  child: PortfolioChart(
+                    funds: activeFunds,
+                    subscribedFunds: portfolio.subscribedFunds,
+                  ),
+                ),
+              ),
+
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
+              padding: EdgeInsets.fromLTRB(
+                  20, activeFunds.isNotEmpty ? 28 : 28, 20, 12),
               sliver: SliverToBoxAdapter(
                 child: Text('Fondos activos',
                     style: theme.textTheme.displayMedium),
@@ -119,7 +132,7 @@ class PortfolioScreen extends ConsumerWidget {
                             itemCount: activeFunds.length,
                             itemBuilder: (_, index) => StaggeredItem(
                               index: index,
-                              child: ActiveFundTile(fund: activeFunds[index]),
+                              child: ActiveFundTile(fund: activeFunds[index], colorIndex: index),
                             ),
                           ),
                         )
@@ -131,7 +144,7 @@ class PortfolioScreen extends ConsumerWidget {
                                 const SizedBox(height: 12),
                             itemBuilder: (_, index) => StaggeredItem(
                               index: index,
-                              child: ActiveFundTile(fund: activeFunds[index]),
+                              child: ActiveFundTile(fund: activeFunds[index], colorIndex: index),
                             ),
                           ),
                         ),

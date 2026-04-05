@@ -7,11 +7,13 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../data/models/fund.dart';
 import '../../../providers/portfolio_provider.dart';
 import 'fund_detail_sheet.dart';
+import 'portfolio_chart.dart' show kPortfolioChartColors;
 
 class ActiveFundTile extends ConsumerWidget {
   final Fund fund;
+  final int colorIndex;
 
-  const ActiveFundTile({super.key, required this.fund});
+  const ActiveFundTile({super.key, required this.fund, this.colorIndex = 0});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,6 +25,8 @@ class ActiveFundTile extends ConsumerWidget {
 
     final isFpv = fund.category == FundCategory.fpv;
     final categoryColor = isFpv ? AppColors.blue : AppColors.teal;
+    final chartColor =
+        kPortfolioChartColors[colorIndex % kPortfolioChartColors.length];
 
     return Material(
       color: isDark ? AppColors.darkSurfaceVariant : Colors.white,
@@ -41,7 +45,13 @@ class ActiveFundTile extends ConsumerWidget {
           size: 24,
           color: categoryColor,
         ),
-        title: Row(
+        title: Text(
+          fund.name,
+          style: theme.textTheme.headlineSmall?.copyWith(fontSize: 14),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Row(
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -61,21 +71,18 @@ class ActiveFundTile extends ConsumerWidget {
                 ),
               ),
             ),
-          ],
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 3),
-            Text(
-              fund.name,
-              style: theme.textTheme.headlineSmall?.copyWith(fontSize: 14),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            const SizedBox(width: 6),
+            Container(
+              width: 7,
+              height: 7,
+              decoration: BoxDecoration(
+                color: chartColor,
+                shape: BoxShape.circle,
+              ),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(width: 8),
             Text(
-              'Invertido: ${CurrencyFormatter.format(investedAmount)}',
+              CurrencyFormatter.format(investedAmount),
               style: theme.textTheme.bodySmall,
             ),
           ],
