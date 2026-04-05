@@ -147,6 +147,24 @@ La aplicación está desplegada en AWS S3 + CloudFront:
  
 ---
  
+## CI/CD — Redespliegue automático
+
+Cada push a `main` dispara el workflow de GitHub Actions que despliega automáticamente a producción:
+
+```
+push → main → GitHub Actions → flutter build web → aws s3 sync → CloudFront invalidation
+```
+
+El workflow (`.github/workflows/deploy.yml`) ejecuta los siguientes pasos:
+
+1. **Build** — `flutter build web --release`
+2. **Deploy a S3** — sincroniza `build/web/` con el bucket `invex-up-app`, con cache-control optimizado (`max-age` largo para assets estáticos, `no-cache` para `index.html`)
+3. **Invalidación de CloudFront** — limpia el caché CDN para que los cambios sean inmediatos
+
+Las credenciales de AWS se inyectan como secrets de GitHub (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`) sin quedar expuestas en el repositorio.
+
+---
+
 ## Decisiones técnicas
  
 **`NotifierProvider` sobre `StateNotifierProvider`** — la API de Riverpod 3 unifica el patrón en una sola clase con estado mutable tipado, eliminando el boilerplate del `state = state.copyWith(...)` repetitivo.
