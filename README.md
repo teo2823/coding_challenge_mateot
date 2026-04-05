@@ -2,7 +2,12 @@
   <img width="120" height="120" src="https://github.com/user-attachments/assets/d5bb299f-3ccc-4c73-94e6-5da0166485e5" />
   <h1>Invex Up - Prueba técnica</h1>
   <p>Gestión de fondos de inversión FPV / FIC — Flutter + AWS</p>
- 
+  <p>
+    <a href="https://d26pavxj11ukhg.cloudfront.net">
+      🚀 Live Demo
+    </a>
+  </p>
+  
   <p>
     <a href="https://d26pavxj11ukhg.cloudfront.net">
       <img src="https://img.shields.io/badge/demo-live-38C8A8?style=flat-square&logo=amazonaws" alt="Live Demo"/>
