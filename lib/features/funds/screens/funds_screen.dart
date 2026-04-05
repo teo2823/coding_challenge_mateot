@@ -37,7 +37,7 @@ class _FundsScreenState extends ConsumerState<FundsScreen> {
           // Header + filtros
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+              padding: EdgeInsets.fromLTRB(20, isWideScreen ? 32 : 8, 20, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

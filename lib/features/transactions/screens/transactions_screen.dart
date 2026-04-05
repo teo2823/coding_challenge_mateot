@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -31,6 +32,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
         .toList();
 
     final hasFilters = _typeFilter != null;
+    final isWideScreen = kIsWeb && MediaQuery.sizeOf(context).width >= 600;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -39,7 +41,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
           const CustomAppBar(),
 
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+            padding: EdgeInsets.fromLTRB(20, isWideScreen ? 32 : 8, 20, 0),
             sliver: SliverToBoxAdapter(
               child: Text('Historial', style: theme.textTheme.displayMedium),
             ),
